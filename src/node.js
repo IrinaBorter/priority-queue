@@ -39,45 +39,54 @@ class Node {
 
 			if (this === this.parent.left) {
 				if (this.parent.right) {
+					const rightChild = this.right;
 					this.parent.right.parent = this;
+					this.right = this.parent.right;
+					this.parent.right = rightChild;
+					if (rightChild) {
+						rightChild.parent = this.parent;
+					}
+				} else {
+					this.parent.right = null;
 				}
-				this.right = this.parent.right;
-				this.parent.left = this.parent.right = null;
+				this.parent.left = null;
 				this.parent.parent = this;
                 if (this.left) {
                     this.parent.left = this.left;
 					this.left.parent = this.parent;
                 }
                 this.left = this.parent;
-                if (preParent) {
-                    if (this.parent === preParent.left) {
-                        preParent.left = this;
-                    } else {
-                        preParent.right = this;
-                    }
-                    this.parent = preParent;
-                } else {
-					this.parent = preParent;
-				}
-				return this;
 			}
 			if (this === this.parent.right) {
-			    this.left = this.parent.left;
-                this.parent.left.parent = this;
-				this.parent.left = this.parent.right = null;
-                this.parent.parent = this;
-                this.right = this.parent;
-                if (preParent) {
-                    if (this.parent === preParent.left) {
-                        preParent.left = this;
-                    } else {
-                        preParent.right = this;
-                    }
-                    this.parent = preParent;
-                } else {
-					this.parent = preParent;
+				if (this.parent.left) {
+					const leftChild = this.left;
+					this.parent.left.parent = this;
+					this.left = this.parent.left;
+					this.parent.left = leftChild;
+					if (leftChild) {
+						leftChild.parent = this.parent;
+					}
+				} else {
+					this.parent.left = null;
 				}
+				this.parent.right = null;
+                this.parent.parent = this;
+				if (this.right) {
+					this.parent.right = this.right;
+					this.right.parent = this.parent;
+				}
+                this.right = this.parent;
             }
+			if (preParent) {
+				if (this.parent === preParent.left) {
+					preParent.left = this;
+				} else {
+					preParent.right = this;
+				}
+				this.parent = preParent;
+			} else {
+				this.parent = preParent;
+			}
 		}
 		return this;
 	}

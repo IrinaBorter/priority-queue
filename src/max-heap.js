@@ -45,8 +45,11 @@ class MaxHeap {
 	restoreRootFromLastInsertedNode(detached) {
 		if (this.parentNodes.length && detached.left) {
 			const lastInsertedNode = this.parentNodes.pop();
-
+			const parent = lastInsertedNode.parent;
 			lastInsertedNode.remove();
+			if (parent && this.parentNodes.indexOf(parent) === -1) {
+				this.parentNodes.unshift(parent);
+			}
 			if (detached.left !== lastInsertedNode && detached.right !== lastInsertedNode) {
 				lastInsertedNode.left = detached.left;
 				lastInsertedNode.left.parent = lastInsertedNode;
@@ -108,39 +111,22 @@ class MaxHeap {
 			} else {
 				this.parentNodes[this.parentNodes.indexOf(node)] = swappedItem;
 			}
-
+			if (swappedItem === this.root) {
+				this.root = node;
+			}
 			this.shiftNodeUp(node);
-			this.root = node;
 		}
 	}
 
 	shiftNodeDown(node) {
-		let swappedItem;
-
-		if (node.left && node.priority < node.left.priority) {
-			swappedItem = node.left;
-			if (swappedItem.parent === this.root) {
-				this.root = swappedItem;
-			}
-			node.left.swapWithParent();
-			if (this.parentNodes.indexOf(node) === -1) {
-				this.parentNodes[this.parentNodes.indexOf(swappedItem)] = node;
-			} else {
-				this.parentNodes[this.parentNodes.indexOf(swappedItem)] = node;
-				this.parentNodes[this.parentNodes.indexOf(node)] = swappedItem;
-			}
+		if (node.left && node.priority < node.left.priority &&
+			(!node.right || node.left.priority > node.right.priority)) {
+			this.shiftNodeUp(node.left);
 			this.shiftNodeDown(node);
 		}
-
-		if (node.right && node.priority < node.right.priority) {
-			swappedItem = node.right;
-			node.right.swapWithParent();
-			if (this.parentNodes.indexOf(node) !== -1) {
-				this.parentNodes[this.parentNodes.indexOf(swappedItem)] = node;
-			} else {
-				this.parentNodes[this.parentNodes.indexOf(node)] = swappedItem;
-				this.parentNodes[this.parentNodes.indexOf(swappedItem)] = node;
-			}
+		if (node.right && node.priority < node.right.priority &&
+			(!node.left || node.right.priority > node.left.priority)) {
+			this.shiftNodeUp(node.right);
 			this.shiftNodeDown(node);
 		}
 	}
